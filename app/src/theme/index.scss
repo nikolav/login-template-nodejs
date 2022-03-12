@@ -1,0 +1,207 @@
+@use "sass:string";
+@use "sass:meta";
+@use "sass:math";
+
+
+:root {
+    --theme: "primary";
+}
+
+$primary: orange;
+
+
+$colors: (
+  "primary": $primary,
+);
+
+$breakpoints: (
+    //   "default": 0,
+    "sm": 576px,
+    "md": 720px,
+    "lg": 1196px,
+    "xl": 1566px
+);
+ 
+$theme-type: "primary", "dark";
+
+// 
+// white space defaults
+$margin-base           : 0.25em;
+$padding-base          : 0.25em;
+
+$letter-spacing-base   : 0.028em;
+$line-height-base      : 100%;
+$line-height-increment : 20%;
+
+
+
+@mixin breakpoint-and-up($size) {
+  @media screen and (min-width: $size) {
+    @content;
+  }
+}
+
+@mixin media-sm {
+  @media screen and (min-width: map-get($breakpoints, "sm")) {
+    @content;
+  }
+}
+@mixin media-md {
+  @media screen and (min-width: map-get($breakpoints, "md")) {
+    @content;
+  }
+}
+@mixin media-lg {
+  @media screen and (min-width: map-get($breakpoints, "lg")) {
+    @content;
+  }
+}
+@mixin media-xl {
+  @media screen and (min-width: map-get($breakpoints, "xl")) {
+    @content;
+  }
+}
+
+$utilities: (
+  "padding": (
+    "prefix": "p",
+    "props": (
+      "0": 0,
+      "1": $padding-base,
+      "2": $padding-base * 2,
+      "3": $padding-base * 3,
+      "4": $padding-base * 4,
+    ),
+    "is-responsive": true,
+  ),
+  "margin": (
+    "prefix": "m",
+    "props": (
+      "0": 0,
+      "1": $margin-base,
+      "2": $margin-base * 2,
+      "3": $margin-base * 3,
+      "4": $margin-base * 4,
+    ),
+    "is-responsive": true,
+  ),
+  "display": (
+    "prefix": "d",
+    "props": (
+      "none": "none",
+      "block": "block",
+      "inline": "inline"
+    ),
+    "is-responsive": true,
+  ),
+  "text-align": (
+    "prefix": "ta",
+    "props": (
+      "l": "left",
+      "r": "right",
+      "center": "center",
+      "justify": "justify",
+    ),
+    "is-responsive": true,
+  ),
+  "letter-spacing": (
+    "prefix": "ls",
+    "props": (
+      "1": $letter-spacing-base,
+      "2": $letter-spacing-base * 2,
+      "3": $letter-spacing-base * 3,
+      "4": $letter-spacing-base * 4,
+    ),
+    "is-responsive": false,
+  ),
+  "line-height": (
+    "prefix": "lh",
+    "props": (
+      "1": $line-height-base + $line-height-increment,
+      "2": $line-height-base + $line-height-increment * 2,
+      "3": $line-height-base + $line-height-increment * 3,
+      "4": $line-height-base + $line-height-increment * 4,
+    ),
+    "is-responsive": false,
+  ),
+  "text-shadow": (
+    "prefix": "text-shadow",
+    "props": (
+      "sm": "1px 1px 2px rgba(0,0,0,.2)",
+      "lg": "2px 2px 5px rgba(0,0,0,.4)",
+    ),
+    "is-responsive": false,
+  ),
+  "opacity": (
+      "prefix": "o", 
+      "props": (
+          "10": .1,
+          "20": .2,
+          "30": .3,
+          "40": .4,
+          "50": .5,
+          "60": .6,
+          "70": .7,
+          "80": .8,
+          "90": .9,
+      ),
+      "is-responsive": false,
+  ),
+);
+
+@mixin unquote-if-string($prop-name, $input, $is-important: false) {
+  @if ("string" == meta.type-of($input)) {
+    @if ($is-important) {
+      #{$prop-name}: string.unquote($input) !important;
+    } @else {
+      #{$prop-name}: string.unquote($input);
+    }
+  } @else {
+    @if ($is-important) {
+      #{$prop-name}: $input !important;
+    } @else {
+      #{$prop-name}: $input;
+    }
+  }
+}
+
+// render utilities
+@each $util-key, $util-value in $utilities {
+  $prop-name : $util-key;
+  $prefix    : map-get($util-value, "prefix");
+  $props     : map-get($util-value, "props");
+
+  @each $key, $val in $props {
+    .#{$prefix}-#{$key} {
+      @include unquote-if-string($prop-name, $val);
+    }
+  }
+
+  // optionaly render responsive utils
+  @if (map-get($util-value, "is-responsive")) {
+    @each $size-k, $size-v in $breakpoints {
+      @each $key, $val in $props {
+        .#{$prefix}-#{$size-k}-#{$key} {
+          @include breakpoint-and-up($size-v) {
+            @include unquote-if-string($prop-name, $val, true);
+          }
+        }
+      }
+    }
+  }
+}
+//
+
+//
+h1 {
+  background: transparent
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQxLjk0bW0iIGhlaWdodD0iMTQwLjg2bW0iIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE0MS45NCAxNDAuODYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTUyLjMwMSAtNTUuNzE0KSI+CiAgICA8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCguMjY0NTggMCAwIC4yNjQ1OCA3NC4yNSAyMC44MzMpIiBkPSJtMzA4Ljg5IDY2NC4yMi0xNTQuMTMtMTA5LjMyLTE3Ny40NCA2NC45ODcgNTYuMzQ3LTE4MC4zNy0xMTYuNjQtMTQ4LjY3IDE4OC45NS0yLjE0NzIgMTA1LjM1LTE1Ni44NyA2MC40MzEgMTc5LjA0IDE4MS43NSA1MS43MTgtMTUxLjYgMTEyLjh6IiBmaWxsPSIjY2NjIiBmaWxsLW9wYWNpdHk9Ii41Ii8+CiAgPC9nPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC01Mi4zMDEgLTU1LjcxNCkiIGRpc3BsYXk9Im5vbmUiPgogICAgPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoLjI2NDU4IDAgMCAuMjY0NTggNzQuMjUgMjAuODMzKSIgZD0ibTMwOC44OSA2NjQuMjItMTU0LjEzLTEwOS4zMi0xNzcuNDQgNjQuOTg3IDU2LjM0Ny0xODAuMzctMTE2LjY0LTE0OC42NyAxODguOTUtMi4xNDcyIDEwNS4zNS0xNTYuODcgNjAuNDMxIDE3OS4wNCAxODEuNzUgNTEuNzE4LTE1MS42IDExMi44eiIgZmlsbD0iI2JiZTRlNCIgZmlsbC1vcGFjaXR5PSIuODIyODQiLz4KICA8L2c+Cjwvc3ZnPgo=");
+  background-size: contain;
+  background-repeat: no-repeat;
+  &:hover {
+    background-image: transparent url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTM2LjQ4IiBoZWlnaHQ9IjUzMi4zOSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTQxLjk0IDE0MC44NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNTIuMzAxIC01NS43MTQpIiBkaXNwbGF5PSJub25lIj4KICAgIDxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KC4yNjQ1OCAwIDAgLjI2NDU4IDc0LjI1IDIwLjgzMykiIGQ9Im0zMDguODkgNjY0LjIyLTE1NC4xMy0xMDkuMzItMTc3LjQ0IDY0Ljk4NyA1Ni4zNDctMTgwLjM3LTExNi42NC0xNDguNjcgMTg4Ljk1LTIuMTQ3MiAxMDUuMzUtMTU2Ljg3IDYwLjQzMSAxNzkuMDQgMTgxLjc1IDUxLjcxOC0xNTEuNiAxMTIuOHoiIGZpbGw9IiNjY2MiIGZpbGwtb3BhY2l0eT0iLjUiLz4KICA8L2c+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTUyLjMwMSAtNTUuNzE0KSI+CiAgICA8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCguMjY0NTggMCAwIC4yNjQ1OCA3NC4yNSAyMC44MzMpIiBkPSJtMzA4Ljg5IDY2NC4yMi0xNTQuMTMtMTA5LjMyLTE3Ny40NCA2NC45ODcgNTYuMzQ3LTE4MC4zNy0xMTYuNjQtMTQ4LjY3IDE4OC45NS0yLjE0NzIgMTA1LjM1LTE1Ni44NyA2MC40MzEgMTc5LjA0IDE4MS43NSA1MS43MTgtMTUxLjYgMTEyLjh6IiBmaWxsPSIjZDdiMTk3IiBmaWxsLW9wYWNpdHk9Ii43OTQzOSIvPgogIDwvZz4KPC9zdmc+Cg==");
+  }
+  padding-left: 57px;
+  cursor: default;
+  // background-origin: content-box;
+}
