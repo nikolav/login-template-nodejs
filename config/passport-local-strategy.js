@@ -14,8 +14,7 @@ module.exports = passport => {
 
     new Strategy({
       usernameField: "email",
-    }),
-
+    },
 
     // authenticate user with this credentials
     //  done(<error>, <result>, <options>)
@@ -43,7 +42,7 @@ module.exports = passport => {
             });
         })
         .catch(error => done(error, null, {message: "try again"}));
-    }
+    })
   );
 
   // assign serialize/deserialize functions to store user data under sesion cookie

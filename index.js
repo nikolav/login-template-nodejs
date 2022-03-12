@@ -2,8 +2,10 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
-const express      = require("express");
 const path         = require("path");
+const appPath      = path.resolve(__dirname, ".");
+
+const express      = require("express");
 const cookieParser = require("cookie-parser");
 const logger       = require("morgan");
 const cors         = require("cors");
@@ -11,12 +13,10 @@ const session      = require("express-session");
 const flash        = require("connect-flash");
 const passport     = require("passport");
 const override     = require("method-override");
-
 // const { User } = require("./config/db");
 const indexRouter = require(`${appPath}/api/routes/index`);
 const apiRouter   = require(`${appPath}/api/routes/api`);
 
-const appPath     = path.resolve(__dirname, ".");
 
 const app         = express();
 
@@ -35,7 +35,7 @@ app.use(override("_method"));
 // access the session @ `req.session`
 app.use(
   session({
-    secret: password.env.EXPRESS_SESSION_APIKEY,
+    secret: process.env.EXPRESS_SESSION_APIKEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
