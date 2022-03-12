@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 
+
 const dotenv = require("dotenv");
 dotenv.config();
+
 
 /**
  * Module dependencies.
@@ -22,19 +24,36 @@ var http  = require("http");
 var port = normalizePort(process.env.PORT);
 app.set("port", port);
 
+
+
+
+// @todo; handle 404s
+app.use((req, res, next) => {
+  console.log(404);
+  next();
+});
+
+// setup global error handling
+app.use((error, req, res, next) => {
+  // ignore; log, die(1)
+  console.log(error);
+});
+
+
 /**
  * Create HTTP server.
  */
 
 var server = http.createServer(app);
 
+
 /**
  * Listen on provided port, on all network interfaces.
  */
 
+server.on("error"     , onError);
+server.on("listening" , onListening);
 server.listen(port);
-server.on("error", onError);
-server.on("listening", onListening);
 
 /**
  * Normalize a port into a number, string, or false.

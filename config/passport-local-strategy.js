@@ -13,6 +13,7 @@ module.exports = passport => {
   passport.use(
 
     new Strategy(
+      
     {
       usernameField: "email",
     },
@@ -24,30 +25,29 @@ module.exports = passport => {
       User.findOne({ email })
         .then(user => {
             
-            
             if (!user)
-              return done(null, null, { message: "email is not registered" });
-            
+              return done(null, null, { message: "you are not registered" });
             
             // verify password
             bcrypt.compare(password, user.passwordHash, (error, match) => {
 
                 if (error)
-                  return done(error, null, {message: "try again"});
+                  return done(error, null, { message: "try again  #uyju#" });
 
                 if (!match)
-                  return done(null, null, {message: "invalid credentials"})
+                  return done(null, null, { message: "invalid credentials" });
                 
                 if (match)
-                  return done(null, user, {message: "successfully authenticated"});
+                  return done(null, user, { message: "successfully authenticated" });
                 
             });
         })
-        .catch(error => done(error, null, {message: "try again"}));
+        .catch(error => done(error, null, { message: "try again  #ihxi#" }));
     })
   );
 
-  // assign serialize/deserialize functions to store user data under sesion cookie
+  // assign serialize/deserialize functions
+  //  store user data under sesion cookie
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser((id, done) => 
     User.findById(id).then(user => done(null, user)));

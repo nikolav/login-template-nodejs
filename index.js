@@ -12,33 +12,46 @@ const cors         = require("cors");
 const session      = require("express-session");
 const flash        = require("connect-flash");
 const passport     = require("passport");
+const MongoStore   = require("connect-mongo");
 const override     = require("method-override");
-// const { User } = require("./config/db");
+
 const indexRouter = require(`${appPath}/api/routes/index`);
 const apiRouter   = require(`${appPath}/api/routes/api`);
 
+const app = express();
 
-const app         = express();
 
 // method POST request to DELETE
-// usage: <form action="/action?_method=DELETE" method="POST">...
+//   usage: <form action="/action?_method=DELETE" method="POST">
 app.use(override("_method"));
-app.use(logger("dev")); // combined
+
+// app.use(logger("combined")); // prod.
+app.use(logger("dev")); 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // use `qs`
 app.use(cookieParser());
 app.use(cors());
 
-
-// setup session usage
-// access the session @ `req.session`
+// session setup
+// access @ `req.session`
 app.use(
   session({
+
     secret: process.env.EXPRESS_SESSION_APIKEY,
+
+    // ignore blank sessions
     resave: false,
     saveUninitialized: false,
+
+    // mongodb session storage engine
+    store: MongoStore.create({
+      mongoUrl       : process.env.MONGODB_URI, 
+      collectionName : process.env.MONGODB_COLLECTION_SESSIONDATA,   
+    }),
+
+    // invalidate session cookie in 14 days
     cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 14 * 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -53,36 +66,42 @@ app.use(passport.session());
 require("./config/passport-local-strategy")(passport);
 
 
-// set global flash messages
+// global flash messages
+//   accessible in views
 // run: `req.flash(<msg_name>, <msg_value>)`
 //   before redirects to set messages for next page
 app.use((req, res, next) => {
   
-  // generic messages
-  res.locals.message         = req.flash("message")         || null;
+  // generic message
+  res.locals.message  = req.flash("message")  || null;
   
   // general app status messages
-  res.locals.error           = req.flash("error")           || null;
-  res.locals.success         = req.flash("success")         || null;
-  res.locals.info            = req.flash("info")            || null;
-  res.locals.warning         = req.flash("warning")         || null;
-  res.locals.danger          = req.flash("danger")          || null;
+  res.locals.error    = req.flash("error")    || null;
+  res.locals.success  = req.flash("success")  || null;
+  res.locals.info     = req.flash("info")     || null;
+  res.locals.warning  = req.flash("warning")  || null;
+  res.locals.danger   = req.flash("danger")   || null;
 
-  // form status messages
-  res.locals.error_message   = req.flash("error_message")   || null;
-  res.locals.success_message = req.flash("success_message") || null;
-  
+  // vardump locals
+  // debug only in dev
+  res.locals.locals = 
+    JSON.stringify(res.locals, null, 2) || null;
+
+
   // other mwares
   next();
 
 });
 
-
+// send static content
 app.use(express.static(path.join(__dirname, "app", "public")));
 
 
-app.use(require("express-ejs-layouts"));
+// setup view engine
 app.set("views", "views");
+
+// use layouts
+app.use(require("express-ejs-layouts"));
 app.set("view engine", "ejs");
 
 // ejs-layouts setup
@@ -91,6 +110,7 @@ app.set("layout", "layout/index");
 app.set("layout extractMetas"  , true);
 app.set("layout extractStyles" , true);
 app.set("layout extractScripts", true);
+
 
 
 // mount routes

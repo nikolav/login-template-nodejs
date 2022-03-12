@@ -10,11 +10,16 @@ dotenv.config();
 mongoose.connect(process.env.MONGODB_URI);
 
 mongoose.connection.on("open", () => 
-  console.log(`connection open @mongoose`) );
+  console.log(`connection open @mongoose`));
+
 
 const userSchema = new Schema({
   name  : String,
-  email : String,
+  email : {
+    type     : String,
+    index    : true,
+    required : true,
+  },
   passwordHash: String,
 
   "_@": {
@@ -33,9 +38,10 @@ const appDataSchema = new Schema({
   value: String,
 });
 
+// methods before compiling with mongoose.model
+// schema.methods.<method> = function... -> @Model.prototype
 
-
-const User    = model(process.env.MONGODB_COLLECTION_USERS   , userSchema);
-const AppData = model(process.env.MONGODB_COLLECTION_APPDATA , appDataSchema);
+const User    = model( process.env.MONGODB_COLLECTION_USERS  , userSchema    );
+const AppData = model( process.env.MONGODB_COLLECTION_APPDATA, appDataSchema );
 
 module.exports = { mongoose, User, AppData };
