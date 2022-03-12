@@ -20,12 +20,6 @@ const user_ = {
   password: "111",
 };
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-  res.json({
-    status: 0,
-  });
-});
 
 router.get("/data", mw_auth, (req, res) => {
 

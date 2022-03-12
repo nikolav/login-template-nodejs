@@ -9,19 +9,21 @@ const { User }     = require(process.env.MONGODB_CONFIG);
 const bcrypt       = require("bcryptjs");
 
 module.exports = passport => {
-
+  
   passport.use(
 
-    new Strategy({
+    new Strategy(
+    {
       usernameField: "email",
     },
 
     // authenticate user with this credentials
     //  done(<error>, <result>, <options>)
     (email, password, done) => {
-      
+
       User.findOne({ email })
         .then(user => {
+            
             
             if (!user)
               return done(null, null, { message: "email is not registered" });

@@ -20,15 +20,14 @@ const apiRouter   = require(`${appPath}/api/routes/api`);
 
 const app         = express();
 
+// method POST request to DELETE
+// usage: <form action="/action?_method=DELETE" method="POST">...
+app.use(override("_method"));
 app.use(logger("dev")); // combined
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // use `qs`
 app.use(cookieParser());
 app.use(cors());
-
-// method POST request to DELETE
-// usage: <form action="/action?_method=DELETE" method="POST">...
-app.use(override("_method"));
 
 
 // setup session usage
@@ -81,6 +80,8 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, "app", "public")));
 
+
+app.use(require("express-ejs-layouts"));
 app.set("views", "views");
 app.set("view engine", "ejs");
 
@@ -90,9 +91,11 @@ app.set("layout", "layout/index");
 app.set("layout extractMetas"  , true);
 app.set("layout extractStyles" , true);
 app.set("layout extractScripts", true);
-app.use(require("express-ejs-layouts"));
 
+
+// mount routes
 app.use("/", indexRouter);
 app.use("/api", apiRouter);
+
 
 module.exports = app;
