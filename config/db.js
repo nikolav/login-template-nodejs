@@ -1,25 +1,26 @@
-const dotenv = require("dotenv");
+
+const dotenv   = require("dotenv");
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
+
 
 dotenv.config();
 
 mongoose.connect(process.env.MONGODB_URI);
 
-mongoose.connection.on("open", () => {
-  console.log(`connection open @mongoose`);
-});
+mongoose.connection.on("open", () => 
+  console.log(`connection open @mongoose`) );
 
 const userSchema = new Schema({
-  name: String,
-  email: String,
+  name  : String,
+  email : String,
   passwordHash: String,
 
   "_@": {
-    type: Date,
-    default: Date.now,
-    immutable: true,
+    type      : Date,
+    default   : Date.now,
+    immutable : true,
   },
 });
 

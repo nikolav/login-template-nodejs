@@ -1,1 +1,35 @@
-register
+
+<form action="/register" method="POST">
+    <h1>Register</h1>
+    <div class="mb-3 row">
+        <label for="name" class="col-sm-2 col-form-label">Name</label>
+        <div class="col-sm-10">
+            <input required type="text" class="form-control" id="name" name="name" value="">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="email" class="col-sm-2 col-form-label">Email</label>
+        <div class="col-sm-10">
+            <input required type="email" class="form-control" id="email" name="email" value="">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="password" class="col-sm-2 col-form-label">Password</label>
+        <div class="col-sm-10">
+            <input required type="password" class="form-control" id="password" name="password" value="">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="password2" class="col-sm-2 col-form-label">Password Confirmation</label>
+        <div class="col-sm-10">
+            <input required type="password" class="form-control" id="password2" name="password2" value="">
+        </div>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary btn-lg">Register</button>
+    </div>
+
+</form>
+<hr />
+<a href="/login">Login</a>
+
