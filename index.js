@@ -1,6 +1,7 @@
 
 const dotenv = require("dotenv");
-dotenv.config();
+// dotenv.config();
+  dotenv.config();
 
 const path         = require("path");
 const appPath      = path.resolve(__dirname, ".");
